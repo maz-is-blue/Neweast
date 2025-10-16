@@ -1,5 +1,8 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
+const QRCode = require('qrcode');
+const fs = require('fs');
+const path = require('path');
 const MessageLog = require('../models/MessageLog');
 
 class WhatsAppWebService {
@@ -8,6 +11,8 @@ class WhatsAppWebService {
     this.isReady = false;
     this.messageQueue = [];
     this.isProcessingQueue = false;
+    this.qrCodeData = null;
+    this.qrCodePath = path.join(__dirname, '../public/qr-code.png');
   }
 
   // Initialize WhatsApp client
@@ -34,15 +39,41 @@ class WhatsAppWebService {
       });
 
       // QR Code event (for initial login)
-      this.client.on('qr', (qr) => {
+      this.client.on('qr', async (qr) => {
         console.log('\n========================================');
         console.log('📱 SCAN THIS QR CODE WITH YOUR WHATSAPP');
         console.log('========================================\n');
+        
+        // Save QR code data for API access
+        this.qrCodeData = qr;
+        
+        // Generate QR code image
+        try {
+          await QRCode.toFile(this.qrCodePath, qr, {
+            width: 400,
+            margin: 2,
+            color: {
+              dark: '#000000',
+              light: '#FFFFFF'
+            }
+          });
+          console.log('✅ QR Code saved to:', this.qrCodePath);
+          console.log('\n📱 OPTION 1: Scan QR Code via Browser');
+          console.log('   Open: http://localhost:3070/qr');
+          console.log('   Or: http://YOUR_SERVER_IP:3070/qr');
+          console.log('\n📱 OPTION 2: Download QR Code');
+          console.log('   Download: http://localhost:3070/qr-code.png\n');
+        } catch (error) {
+          console.error('Error generating QR code image:', error);
+        }
+        
+        // Also display in terminal (might not work properly over SSH)
         qrcode.generate(qr, { small: true });
+        
         console.log('\n1. Open WhatsApp on your phone');
         console.log('2. Go to Settings > Linked Devices');
         console.log('3. Tap "Link a Device"');
-        console.log('4. Scan the QR code above\n');
+        console.log('4. Scan the QR code from browser or image file\n');
       });
 
       // Ready event
@@ -243,6 +274,16 @@ class WhatsAppWebService {
       };
     }
     return null;
+  }
+
+  // Get QR code data
+  getQRCodeData() {
+    return this.qrCodeData;
+  }
+
+  // Get QR code path
+  getQRCodePath() {
+    return this.qrCodePath;
   }
 
   // Logout
