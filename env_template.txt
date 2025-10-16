@@ -1,0 +1,43 @@
+# Copy this file to .env and fill in your actual values
+
+# ============================================
+# WHATSAPP WEB CONFIGURATION
+# ============================================
+# No configuration needed!
+# Just scan QR code when starting the server
+
+# ============================================
+# SERVER CONFIGURATION
+# ============================================
+PORT=3000
+# For development with ngrok, use your ngrok URL
+# For production, use your actual domain
+BASE_URL=https://your-ngrok-url.ngrok-free.app
+
+# ============================================
+# EVENT CONFIGURATION
+# ============================================
+EVENT_NAME=Automechanika Gala Dinner
+EVENT_DATE=December 12th, 2024
+EVENT_DAY=Thursday
+EVENT_TIME=7:00 PM
+EVENT_LOCATION=Jumeirah Emirates Towers Hotel, Dubai, UAE
+EVENT_CONTACT_EMAIL=clara@neweast.co
+EVENT_CONTACT_PHONE=+971 506 202 914
+
+# ============================================
+# DATABASE
+# ============================================
+DB_PATH=./database/gala_dinner.db
+
+# ============================================
+# REMINDER SCHEDULE
+# ============================================
+# Cron format: "minute hour day month day-of-week"
+# Examples:
+#   0 9 * * *   = 9 AM every day
+#   0 10 * * *  = 10 AM every day  
+#   0 9,17 * * * = 9 AM and 5 PM daily
+#   0 9 * * 1-5 = 9 AM weekdays only
+REMINDER_SCHEDULE=0 9 * * *
+

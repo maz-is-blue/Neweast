@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gala Dinner RSVP Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-card h3 {
+            color: #666;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card .number {
+            font-size: 3em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-card .label {
+            color: #999;
+            margin-top: 5px;
+        }
+        
+        .content-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .content-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .attendee-list {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .attendee-item {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .attendee-info h4 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .attendee-info p {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+        
+        .badge-veg {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-non-veg {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .badge-alcoholic {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .badge-non-alcoholic {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e9ecef;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+            transition: width 0.5s ease;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: #764ba2;
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎉 Gala Dinner RSVP Dashboard</h1>
+            <p>Automechanika Gala Dinner 2024</p>
+        </div>
+        
+        <div id="error-container"></div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Invitees</h3>
+                <div class="number" id="total-invitees">-</div>
+                <div class="label">People invited</div>
+            </div>
+            
+            <div class="stat-card">
+                <h3>Attending</h3>
+                <div class="number" id="attending">-</div>
+                <div class="label">Confirmed guests</div>
+            </div>
+            
+            <div class="stat-card">
+                <h3>Declined</h3>
+                <div class="number" id="declined">-</div>
+                <div class="label">Cannot attend</div>
+            </div>
+            
+            <div class="stat-card">
+                <h3>Pending</h3>
+                <div class="number" id="pending">-</div>
+                <div class="label">Awaiting response</div>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <h2>📊 Response Rate</h2>
+            <div class="progress-bar">
+                <div class="progress-fill" id="response-rate" style="width: 0%">0%</div>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <h2>🍽️ Food & Drink Preferences</h2>
+            <div class="stats-grid">
+                <div>
+                    <h3>Food Preferences</h3>
+                    <p style="margin-top: 10px;">🥗 Vegetarian: <strong id="vegetarian">0</strong></p>
+                    <p>🍖 Non-vegetarian: <strong id="non-vegetarian">0</strong></p>
+                </div>
+                <div>
+                    <h3>Drink Preferences</h3>
+                    <p style="margin-top: 10px;">🥤 Non-alcoholic: <strong id="non-alcoholic">0</strong></p>
+                    <p>🍷 Alcoholic: <strong id="alcoholic">0</strong></p>
+                </div>
+                <div>
+                    <h3>Event Countdown</h3>
+                    <p style="margin-top: 10px; font-size: 2em;" id="countdown">-</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin-bottom: 0;">👥 Attending Guests</h2>
+                <button class="btn" onclick="sendReminders()" id="reminder-btn">
+                    Send Reminders
+                </button>
+            </div>
+            <div id="attendee-list" class="attendee-list">
+                <div class="loading">Loading attendees...</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let stats = null;
+        
+        async function fetchStats() {
+            try {
+                const response = await fetch('/api/stats');
+                if (!response.ok) throw new Error('Failed to fetch stats');
+                stats = await response.json();
+                updateDashboard();
+            } catch (error) {
+                showError('Error loading statistics: ' + error.message);
+            }
+        }
+        
+        async function fetchAttendees() {
+            try {
+                const response = await fetch('/api/invitees/attending');
+                if (!response.ok) throw new Error('Failed to fetch attendees');
+                const attendees = await response.json();
+                displayAttendees(attendees);
+            } catch (error) {
+                document.getElementById('attendee-list').innerHTML = 
+                    '<div class="error">Error loading attendees: ' + error.message + '</div>';
+            }
+        }
+        
+        function updateDashboard() {
+            if (!stats || !stats.invitees) return;
+            
+            const inv = stats.invitees;
+            
+            // Update stats cards
+            document.getElementById('total-invitees').textContent = inv.total_invitees || 0;
+            document.getElementById('attending').textContent = inv.attending || 0;
+            document.getElementById('declined').textContent = inv.declined || 0;
+            document.getElementById('pending').textContent = inv.pending || 0;
+            
+            // Update response rate
+            const responseRate = inv.total_invitees > 0 
+                ? Math.round(((inv.attending + inv.declined) / inv.total_invitees) * 100)
+                : 0;
+            const progressBar = document.getElementById('response-rate');
+            progressBar.style.width = responseRate + '%';
+            progressBar.textContent = responseRate + '%';
+            
+            // Update preferences
+            document.getElementById('vegetarian').textContent = inv.vegetarian || 0;
+            document.getElementById('non-vegetarian').textContent = inv.non_vegetarian || 0;
+            document.getElementById('alcoholic').textContent = inv.alcoholic || 0;
+            document.getElementById('non-alcoholic').textContent = inv.non_alcoholic || 0;
+            
+            // Update countdown
+            const daysLeft = stats.daysUntilEvent;
+            const countdownEl = document.getElementById('countdown');
+            if (daysLeft < 0) {
+                countdownEl.textContent = 'Event passed';
+            } else if (daysLeft === 0) {
+                countdownEl.textContent = 'Today! 🎉';
+            } else {
+                countdownEl.textContent = daysLeft + ' days';
+            }
+        }
+        
+        function displayAttendees(attendees) {
+            const container = document.getElementById('attendee-list');
+            
+            if (attendees.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666;">No attendees yet</p>';
+                return;
+            }
+            
+            container.innerHTML = attendees.map(attendee => `
+                <div class="attendee-item">
+                    <div class="attendee-info">
+                        <h4>${attendee.name}</h4>
+                        <p>${attendee.company || 'No company'} • ${attendee.phone_number}</p>
+                    </div>
+                    <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                        ${attendee.food_preference ? 
+                            `<span class="badge ${attendee.food_preference === 'vegetarian' ? 'badge-veg' : 'badge-non-veg'}">
+                                ${attendee.food_preference}
+                            </span>` : ''}
+                        ${attendee.drink_preference ? 
+                            `<span class="badge ${attendee.drink_preference === 'alcoholic' ? 'badge-alcoholic' : 'badge-non-alcoholic'}">
+                                ${attendee.drink_preference}
+                            </span>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        async function sendReminders() {
+            const btn = document.getElementById('reminder-btn');
+            btn.disabled = true;
+            btn.textContent = 'Sending...';
+            
+            try {
+                const response = await fetch('/api/reminders/send', { method: 'POST' });
+                if (!response.ok) throw new Error('Failed to send reminders');
+                const result = await response.json();
+                alert(`Reminders sent successfully!\n${result.message}`);
+            } catch (error) {
+                showError('Error sending reminders: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Send Reminders';
+            }
+        }
+        
+        function showError(message) {
+            const container = document.getElementById('error-container');
+            container.innerHTML = `<div class="error">${message}</div>`;
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+        
+        // Load data on page load
+        fetchStats();
+        fetchAttendees();
+        
+        // Refresh data every 30 seconds
+        setInterval(() => {
+            fetchStats();
+            fetchAttendees();
+        }, 30000);
+    </script>
+</body>
+</html>
+
