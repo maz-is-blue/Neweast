@@ -2,32 +2,37 @@ require('dotenv').config();
 
 module.exports = {
   event: {
-    name: process.env.EVENT_NAME || 'Automechanika Gala Dinner',
-    date: process.env.EVENT_DATE || 'December 12th, 2024',
+    name: process.env.EVENT_NAME || 'Neweast & AISIN Automechanika Gala Dinner 2025',
+    date: process.env.EVENT_DATE || 'December 11th, 2025',
     day: process.env.EVENT_DAY || 'Thursday',
-    time: process.env.EVENT_TIME || '7:00 PM',
+    time: process.env.EVENT_TIME || '7:00 PM onwards',
     location: process.env.EVENT_LOCATION || 'Jumeirah Emirates Towers Hotel, Dubai, UAE',
     contact: {
       email: process.env.EVENT_CONTACT_EMAIL || 'clara@neweast.co',
-      phone: process.env.EVENT_CONTACT_PHONE || '+971 506 202 914'
-    }
+      phone: process.env.EVENT_CONTACT_PHONE || '+971 50 620 2914'
+    },
+    invitationImage: process.env.INVITATION_IMAGE_PATH || './public/invitation-card.jpg'
   },
   
   messages: {
     greeting: (name) => `Hello, ${name}`,
     
-    invitation: `🌟 You are Cordially Invited! 🌟
+    invitation: `*YOU'RE INVITED TO AN EVENING OF CELEBRATION & INNOVATION!*
 
-We are excited to invite you to our *Automechanika Gala Dinner*. Join us for an evening of networking, fine dining, and exclusive experiences.
+Join us for the *Neweast & AISIN Automechanika Gala Dinner 2025* — a night dedicated to connection, inspiration, and the shared passion that drives the automotive world forward.
 
-📅 Date: December 12th, 2024 - Thursday
-🏨 Location: Jumeirah Emirates Towers Hotel, Dubai, UAE
-🕖 Time: 7:00 PM
+📅 *Thursday, December 11th, 2025*
+📍 *Jumeirah Emirates Towers Hotel, Dubai, UAE*
+🕖 *From 7:00 PM onwards*
 
-We look forward to your attendance.
+Get ready for a night that celebrates excellence, honors achievements, and welcomes the exciting road ahead for Neweast & AISIN. Expect great company, meaningful moments, and a touch of festive magic as we close the year in style!
 
-Please RSVP on:
-📞 +971 506 202 914
+Will you be able to attend? Please reply:
+• *Yes* - I will attend
+• *No* - I cannot make it
+
+For questions, contact:
+📞 +971 50 620 2914
 📧 clara@neweast.co`,
 
     rsvpPrompt: `RSVP by selecting one of the options below:

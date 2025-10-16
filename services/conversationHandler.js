@@ -3,7 +3,9 @@ const RSVP = require('../models/RSVP');
 const ConversationState = require('../models/ConversationState');
 const MessageLog = require('../models/MessageLog');
 const whatsappWebService = require('./whatsappWebService');
-const { messages, conversationStates } = require('../config/eventConfig');
+const { messages, conversationStates, event } = require('../config/eventConfig');
+const fs = require('fs');
+const path = require('path');
 
 class ConversationHandler {
   // Main message handler
@@ -203,20 +205,39 @@ class ConversationHandler {
 
   // Send initial invitation
   static async sendInvitation(invitee) {
+    // Send greeting
     await whatsappWebService.sendMessage(
       invitee.phone_number,
       messages.greeting(invitee.name),
       invitee.id
     );
     
+    // Send invitation with image
     setTimeout(async () => {
-      await whatsappWebService.sendMessage(
-        invitee.phone_number,
-        messages.invitation,
-        invitee.id
-      );
-    }, 1000);
+      const imagePath = path.join(__dirname, '..', event.invitationImage);
+      
+      // Check if invitation image exists
+      if (fs.existsSync(imagePath)) {
+        // Send image with invitation text
+        await whatsappWebService.sendMessageWithMedia(
+          invitee.phone_number,
+          messages.invitation,
+          imagePath,
+          invitee.id
+        );
+        console.log(`📸 Sent invitation with image to ${invitee.name}`);
+      } else {
+        // Send text-only invitation
+        await whatsappWebService.sendMessage(
+          invitee.phone_number,
+          messages.invitation,
+          invitee.id
+        );
+        console.log(`⚠️  Invitation image not found at ${imagePath}, sent text only`);
+      }
+    }, 2000);
     
+    // Send RSVP prompt
     setTimeout(async () => {
       await whatsappWebService.sendMessage(
         invitee.phone_number,
@@ -224,7 +245,7 @@ class ConversationHandler {
         invitee.id
       );
       await ConversationState.setState(invitee.id, conversationStates.AWAITING_RSVP);
-    }, 2000);
+    }, 5000);
   }
 }
 
