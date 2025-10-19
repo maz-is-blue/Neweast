@@ -198,6 +198,52 @@ class WhatsAppWebService {
     }
   }
 
+  // Send message with interactive buttons
+  async sendMessageWithButtons(to, body, buttons, inviteeId = null) {
+    try {
+      if (!this.isReady) {
+        throw new Error('WhatsApp client is not ready');
+      }
+
+      const formattedTo = this.formatPhoneNumber(to);
+      const chatId = `${formattedTo}@c.us`;
+
+      await this.addToQueue(async () => {
+        const { Buttons } = require('whatsapp-web.js');
+        
+        // Create button objects
+        const buttonObjects = buttons.map((btn, index) => ({
+          id: btn.id || `btn_${index}`,
+          body: btn.text
+        }));
+
+        // Create buttons message
+        const buttonMessage = new Buttons(body, buttonObjects, body, '');
+        
+        await this.client.sendMessage(chatId, buttonMessage);
+        
+        await MessageLog.log({
+          inviteeId,
+          phoneNumber: to,
+          direction: 'outgoing',
+          messageBody: `${body} [Buttons: ${buttons.map(b => b.text).join(', ')}]`,
+          status: 'sent'
+        });
+
+        console.log(`✅ Message with buttons sent to ${to}`);
+      });
+
+      return { success: true };
+    } catch (error) {
+      console.error('❌ Error sending WhatsApp message with buttons:', error);
+      console.log('⚠️  Falling back to regular message without buttons');
+      
+      // Fallback: Send regular message if buttons fail
+      const buttonTexts = buttons.map((btn, i) => `${i + 1}. ${btn.text}`).join('\n');
+      return await this.sendMessage(to, `${body}\n\n${buttonTexts}`, inviteeId);
+    }
+  }
+
   // Add message to queue with delay
   async addToQueue(task) {
     return new Promise((resolve, reject) => {

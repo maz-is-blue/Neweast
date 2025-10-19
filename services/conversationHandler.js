@@ -104,9 +104,13 @@ class ConversationHandler {
       );
       
       setTimeout(async () => {
-        await whatsappWebService.sendMessage(
+        await whatsappWebService.sendMessageWithButtons(
           invitee.phone_number,
           messages.foodPreference,
+          [
+            { id: 'food_nonveg', text: '🍖 Non-vegetarian food' },
+            { id: 'food_veg', text: '🥗 Vegetarian food' }
+          ],
           invitee.id
         );
       }, 1000);
@@ -122,10 +126,14 @@ class ConversationHandler {
         invitee.id
       );
     } else {
-      // Unclear response, ask again
-      await whatsappWebService.sendMessage(
+      // Unclear response, ask again with buttons
+      await whatsappWebService.sendMessageWithButtons(
         invitee.phone_number,
         "I didn't quite understand. " + messages.rsvpPrompt,
+        [
+          { id: 'yes_attend', text: '✅ Yes, I will attend' },
+          { id: 'no_attend', text: '❌ No, I cannot make it' }
+        ],
         invitee.id
       );
     }
@@ -145,17 +153,25 @@ class ConversationHandler {
       await RSVP.updateFoodPreference(invitee.id, preference);
       await ConversationState.setState(invitee.id, conversationStates.AWAITING_DRINK_PREFERENCE);
       
-      // Ask for drink preference
-      await whatsappWebService.sendMessage(
+      // Ask for drink preference with buttons
+      await whatsappWebService.sendMessageWithButtons(
         invitee.phone_number,
         messages.drinkPreference,
+        [
+          { id: 'drink_alcoholic', text: '🍷 Alcoholic' },
+          { id: 'drink_nonalcoholic', text: '🥤 Non-alcoholic' }
+        ],
         invitee.id
       );
     } else {
-      // Unclear response, ask again
-      await whatsappWebService.sendMessage(
+      // Unclear response, ask again with buttons
+      await whatsappWebService.sendMessageWithButtons(
         invitee.phone_number,
         "Please select one of the options:\n" + messages.foodPreference,
+        [
+          { id: 'food_nonveg', text: '🍖 Non-vegetarian food' },
+          { id: 'food_veg', text: '🥗 Vegetarian food' }
+        ],
         invitee.id
       );
     }
@@ -185,10 +201,14 @@ class ConversationHandler {
       );
       
     } else {
-      // Unclear response, ask again
-      await whatsappWebService.sendMessage(
+      // Unclear response, ask again with buttons
+      await whatsappWebService.sendMessageWithButtons(
         invitee.phone_number,
         "Please select one of the options:\n" + messages.drinkPreference,
+        [
+          { id: 'drink_alcoholic', text: '🍷 Alcoholic' },
+          { id: 'drink_nonalcoholic', text: '🥤 Non-alcoholic' }
+        ],
         invitee.id
       );
     }
@@ -196,9 +216,13 @@ class ConversationHandler {
 
   // Send RSVP prompt to invitee
   static async sendRSVPPrompt(invitee) {
-    await whatsappWebService.sendMessage(
+    await whatsappWebService.sendMessageWithButtons(
       invitee.phone_number,
       messages.rsvpPrompt,
+      [
+        { id: 'yes_attend', text: '✅ Yes, I will attend' },
+        { id: 'no_attend', text: '❌ No, I cannot make it' }
+      ],
       invitee.id
     );
   }
@@ -237,11 +261,15 @@ class ConversationHandler {
       }
     }, 2000);
     
-    // Send RSVP prompt
+    // Send RSVP prompt with buttons
     setTimeout(async () => {
-      await whatsappWebService.sendMessage(
+      await whatsappWebService.sendMessageWithButtons(
         invitee.phone_number,
         messages.rsvpPrompt,
+        [
+          { id: 'yes_attend', text: '✅ Yes, I will attend' },
+          { id: 'no_attend', text: '❌ No, I cannot make it' }
+        ],
         invitee.id
       );
       await ConversationState.setState(invitee.id, conversationStates.AWAITING_RSVP);
